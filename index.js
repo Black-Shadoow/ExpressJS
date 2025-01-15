@@ -7,11 +7,29 @@ const { json } = require('body-parser');
 
 // Middleware
 app.use(express.json()); 
-app.use(express.urlencoded({ extended: false })); 
+app.use(express.urlencoded({ extended: false }));  //middleman 1
+
+app.use((req, res, next) => {
+    const logEntry = `${Date.now()}: ${req.ip}: ${req.method}: ${req.url}\n`;
+    fs.appendFile('./log.txt', logEntry, (err) => {
+        if (err) {
+            console.error("Failed to write to log file:", err);
+        }
+        next();
+    });
+});
+
+app.use((req,res,next)=>{                           //middleman 3
+    console.log("hello from middle 2 ",req.myusername)
+    next();
+})
+//note==> middleman aways start from top to button
 
 // Routes
 app.get('/', (req, res) => {
+    console.log("I am in get route",req.myusername);
     res.send("<h1>Welcome to Homepage</h1>");
+
 });
 
 app.get('/about', (req, res) => {
