@@ -63,8 +63,9 @@ app.route('/api/user/:id')
         const id = Number(req.params.id);
         const user = users.find((user) => user.id === id);
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "User not found..." });
         }
+       
         return res.json(user);
     })
     .post((req, res) => {
@@ -83,13 +84,16 @@ app.route('/api/user/:id')
 // POST route to create a user
 app.post('/api/user', (req, res) => {
     const body = req.body;
+    if(!body || !body.first_name || !body.last_name || !body.email || !body.gender){
+        return res.status(400).json({msg: "All field are require..."});
+    }
     users.push({ ...body, id: users.length + 1 });
 
     fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err) => {
         if (err) {
             return res.status(500).json({ status: "Error", message: err.message });
         }
-        res.json({ status: "Success", id: users.length });
+        res.status(201).json({ status: "Success", id: users.length });
 
     });
     console.log("Body",body);
